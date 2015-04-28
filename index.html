@@ -1,0 +1,595 @@
+<!DOCTYPE html-->
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="css/jquery-ui.css" />
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery-ui.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<script type="text"/javascript" "charset=utf-8" scr="phonegap.js"></script>
+<title>Tienda de Helados</title>
+<script type="text/javascript">
+$(document).ready(function inicio(){
+
+  var btnGuardar=$("#guardar");
+  btnGuardar.click(function guardar(){
+  var tipo=$("#tipo").val();
+  var sabor=$("#sabor").val();
+  var precio=parseInt($("#precio").val());
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/guardarDatos.php",
+    data:"tipo="+tipo+"&sabor="+sabor+"&precio="+precio,
+    success: registro
+    });
+    
+    function registro(datos){
+    alert("Registro completado");
+    }
+  });
+  
+  var btnConsulta=$("#consultar");//consultar todos los registros
+  btnConsulta.click(function cons(){  
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD.php",
+    data:"",
+    success: consultaDatos
+    });
+    
+    function consultaDatos(datos){
+    var respDatos=$.parseJSON(datos);   
+    var respuesta=$("#resconsulta");
+    dibujarTabla(respuesta, respDatos);    
+    }
+  });
+    function dibujarTabla(respuesta, respDatos) {
+    respuesta.html("");
+    respuesta.append('<table id="tab" border="1">');
+    var tabla=$("#tab");
+    tabla.html("<tr><th>ID</th><th>Tipo</th><th>Sabor</th><th>Precio</th></tr>");
+    for(var i in respDatos){
+      tabla.append("<tr><td>"+respDatos[i].Id+"</td>"
+      +"<td>"+respDatos[i].Tipo+"</td>"
+      +"<td>"+respDatos[i].Sabor+"</td>"
+      +"<td>"+respDatos[i].Precio+"</td></tr>");
+    }
+    tabla.append("</table>");
+    }
+  
+  
+  var consultar2=$("#btnconsultar2");
+  consultar2.click(function cons2(){
+  var valConsulta=$("#valConsulta").val();
+    $.ajax({
+      type:"POST",
+      url:"http://guga141292.260mb.net/consultaBD2.php",
+      data:"Id="+valConsulta,
+      success: consultaProducto
+    });
+    
+    function consultaProducto(datos){
+    var respDatos2=$.parseJSON(datos);   
+    var respuesta2=$("#resconsulta2");
+    dibujarTabla(respuesta2, respDatos2);
+    }
+  });
+var btnConsAct=$("#btnConsAct");
+ btnConsAct.click(function cargarDat(){
+   
+     $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD.php",
+    data:"",
+    success: cargarDatos
+    });
+     function cargarDatos(datos) {
+        var respCarga=$.parseJSON(datos);
+        var respConAct=$("#respConAct");
+        dibujarTabla(respConAct,respCarga);
+     }
+ });
+ 
+  var btnConsAct=$("#btnConsAct");
+  btnConsAct.click(function cargarDat(){  
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD.php",
+    data:"",
+    success: cargarDatos
+    });
+    
+    function cargarDatos(datos){   
+      var respCarga=$.parseJSON(datos);       
+      var respConAct=$("#respConAct");      
+      dibujarTabla(respConAct,respCarga);
+    }
+  });
+  
+  var btnCarDatos=$("#btnCarDatos");
+  btnCarDatos.click(function cargarInf(){
+  var Id=parseInt($("#nomActualizar").val());
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD2.php",
+    data:"Id="+Id,
+    success: cargarDatosAct
+    });
+    
+    function cargarDatosAct(datos){
+      var consDatAct=$.parseJSON(datos);
+      var respCargDatos=$("#respCargDatos");//Div del resultado para dibujar controles
+       if(consDatAct!=0){ 
+      respCargDatos.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+      respCargDatos.append("<label>Tipo:</label><input type='text' id='tip'>");
+      respCargDatos.append("<label>Sabor:</label><input type='text' id='sab'>");
+      respCargDatos.append("<label>Precio:</label><input type='text' id='pre'>");
+      var Id=$("#Id");
+      var tip=$("#tip");
+      var sab=$("#sab");
+      var pre=$("#pre");
+      for(var i in consDatAct){
+	Id.val(consDatAct[i].Id);
+	tip.val(consDatAct[i].Tipo);
+	sab.val(consDatAct[i].Sabor);
+	pre.val(consDatAct[i].Precio);
+       }   
+  }else{
+  respCargDatos.html('<p>No existen registros</p>');
+  }
+    }
+   });
+  
+   var btnGuarDatos=$("#btnGuarDatos");
+      btnGuarDatos.click(function actual(){
+      var id=parseInt($("#Id").val());
+      var tipo=$("#tip").val();
+      var sabor=$("#sab").val();
+      var precio=$("#pre").val();
+
+      if(tipo=="" || sabor=="" || precio=="" ){
+	alert("Ingresa información en todos los campos");
+      }else{
+	$.ajax({
+	  type:"POST",
+	  url:"http://guga141292.260mb.net/actualizar.php",
+	  data:"id="+id+"&tipo="+tipo+"&sabor="+sabor+"&precio="+precio,
+	  success: actualizacion
+	});
+		
+      }   
+      function actualizacion(datos){
+	  alert("tus datos han sido actualizados satisfactoriamente");
+	}
+    
+  });
+  var btnConsEliminar=$("#btnConsEliminar");
+  btnConsEliminar.click(function conEliminar(){
+  $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD.php",
+    data:"",
+    success: consultaAntEliminar
+  });
+  function consultaAntEliminar(datos) {
+    var datAntEliminar=$.parseJSON(datos);
+    var respConElim=$("#respConElim")
+    dibujarTabla(respConElim,datAntEliminar);
+  }
+  });
+   var btnEliminar=$("#btnEliminar");
+   btnEliminar.click(function eliminarDato(){
+    var idEliminar=parseInt($("#idEliminar").val());
+    $.ajax({
+      type:"POST",
+      url:"http://guga141292.260mb.net/eliminar.php",
+      data:"id="+idEliminar,
+      success: Eliminacion
+    });
+    function Eliminacion(datos){
+      alert(datos);
+    }
+   });
+ });
+
+//--------------------------------------------Productos extras----------------------------
+
+$(document).ready(function inicio2(){
+
+  var btnGuardar2=$("#guardar2");
+  btnGuardar2.click(function guardar2(){
+  var nombre=$("#nombre").val();
+  var categoria=$("#categoria").val();
+  var costo=parseInt($("#costo").val());
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/guardarDatos2.php",
+    data:"nombre="+nombre+"&categoria="+categoria+"&costo="+costo,
+    success: registro2
+    });
+    
+    function registro2(datos){
+    alert("Registro completado");
+    }
+  });
+  
+  var btnConsulta22=$("#consultar22");//consultar todos los registros
+  btnConsulta22.click(function cons22(){
+    
+    $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD22.php",
+    data:"",
+    success: consultaDatos22
+    });
+    
+    function consultaDatos22(datos){
+      
+    var respDatos22=$.parseJSON(datos);   
+    var respuesta22=$("#resconsulta22");
+    dibujarTabla22(respuesta22, respDatos22);    
+    }
+  });
+  function dibujarTabla22(respuesta22, respDatos22) {
+    respuesta22.html("");
+    respuesta22.append('<table id="tab22" border="1">');
+    var tabla22=$("#tab22");
+    tabla22.html("<tr><th>ID</th><th>Nombre</th><th>Categoria</th><th>Costo</th></tr>");
+    for(var x in respDatos22){
+      tabla22.append("<tr><td>"+respDatos22[x].Id+"</td>"
+      +"<td>"+respDatos22[x].Nombre+"</td>"
+      +"<td>"+respDatos22[x].Categoria+"</td>"
+      +"<td>"+respDatos22[x].Costo+"</td></tr>");
+    }
+    tabla22.append("</table>");
+    }
+  
+  
+  var consultar3=$("#btnconsultar3");
+  
+  consultar3.click(function cons3(){
+    
+  var valConsulta3=$("#valConsulta3").val();
+    $.ajax({
+      type:"POST",
+      url:"http://guga141292.260mb.net/consultaBD3.php",
+      data:"Id="+valConsulta3,
+      success: consultaProducto3
+    });
+    
+    function consultaProducto3(datos){
+    var respDatos3=$.parseJSON(datos);   
+    var respuesta3=$("#resconsulta3");
+    dibujarTabla22(respuesta3, respDatos3);
+    }
+  });
+var btnConsAct22=$("#btnConsAct22");
+ btnConsAct22.click(function cargarDat22(){
+   
+     $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD22.php",
+    data:"",
+    success: cargarDatos22
+    });
+     function cargarDatos22(datos) {
+        var respCarga22=$.parseJSON(datos);
+        var respConAct22=$("#respConAct22");
+        dibujarTabla22(respConAct22,respCarga22);
+     }
+ });
+ 
+  
+  var btnCarDatos3=$("#btnCarDatos3");
+ 
+  btnCarDatos3.click(function cargarInf3(){
+     
+  var Id=parseInt($("#nomActualizar3").val());
+    
+    $.ajax({
+      type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD3.php",
+      data:"Id="+Id,
+    success: cargarDatosAct3
+    });
+    
+    function cargarDatosAct3(datos){
+      var consDatAct3=$.parseJSON(datos);
+      var respCargDatos3=$("#respCargDatos3");//Div del resultado para dibujar controles
+       if(consDatAct3!=0){ 
+      respCargDatos3.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+      respCargDatos3.append("<label>Nombre:</label><input type='text' id='nom'>");
+      respCargDatos3.append("<label>Categoria:</label><input type='text' id='cat'>");
+      respCargDatos3.append("<label>Costo:</label><input type='text' id='cos'>");
+      var Id=$("#Id");
+      var nom=$("#nom");
+      var cat=$("#cat");
+      var cos=$("#cos");
+      for(var x in consDatAct3){
+	Id.val(consDatAct3[x].Id);
+	nom.val(consDatAct3[x].Nombre);
+	cat.val(consDatAct3[x].Categoria);
+	cos.val(consDatAct3[x].Costo);
+       }   
+  }else{
+  respCargDatos3.html('<p>No existen registros</p>');
+  }
+    }
+   });
+  
+   var btnGuarDatos3=$("#btnGuarDatos3");
+   
+      btnGuarDatos3.click(function actual3(){
+      var id=parseInt($("#Id").val());
+      var nombre=$("#nom").val();
+      var categoria=$("#cat").val();
+      var costo=$("#cos").val();
+
+      if(nombre=="" || categoria=="" || costo=="" ){
+	alert("Ingresa información en todos los campos");
+      }else{
+	$.ajax({
+	  type:"POST",
+	  url:"http://guga141292.260mb.net/actualizar2.php",
+	  data:"id="+id+"&nombre="+nombre+"&categoria="+categoria+"&costo="+costo,
+	  success: actualizacion3
+	});
+		
+      }   
+      function actualizacion3(datos){
+	  alert("tus datos han sido actualizados satisfactoriamente");
+	}
+    
+  });
+  var btnConsEliminar22=$("#btnConsEliminar22");
+  btnConsEliminar22.click(function conEliminar22(){
+  $.ajax({
+    type:"POST",
+    url:"http://guga141292.260mb.net/consultaBD22.php",
+    data:"",
+    success: consultaAntEliminar22
+  });
+  function consultaAntEliminar22(datos) {
+    var datAntEliminar22=$.parseJSON(datos);
+    var respConElim22=$("#respConElim22")
+    dibujarTabla22(respConElim22,datAntEliminar22);
+  }
+  });
+   var btnEliminar22=$("#btnEliminar22");
+   btnEliminar22.click(function eliminarDato22(){
+    var idEliminar22=parseInt($("#idEliminar22").val());
+    $.ajax({
+      type:"POST",
+      url:"http://guga141292.260mb.net/eliminar2.php",
+      data:"id="+idEliminar22,
+      success: Eliminacion22
+    });
+    function Eliminacion22(datos){
+      alert(datos);
+    }
+   });
+ });
+
+</script>
+<style type="text/css">
+p{
+text-align:center;
+}
+</style>
+</head>
+<body>
+<div data-role="page" id="principal">
+  <div data-role="header" >
+    <p>Helados PINKCROW</p>
+  </div>
+  <div data-role="content">
+    <div>
+      <ul data-role="listview">
+        <a href="#menu1" data-role="button" data-transition="slideup">Helados y paletas</a>
+	<a href="#menu2" data-role="button" data-transition="slideup">Productos Extras</a>
+      </ul>
+    </div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="menu1">
+  <div data-role="header" >
+    <p>Helados PINKCROW</p>
+  </div>
+  <div data-role="content">
+    <div>
+      <ul data-role="listview">
+        <a href="#registro" data-role="button" data-transition="slideup">Registtro de helados y paletas</a>
+	<a href="#consulta" data-role="button" data-transition="slideup">Consultar los registros</a>
+	<a href="#consulta2" data-role="button" data-transition="slideup" >Consultar un producto</a>
+        <a href="#actualizar" data-role="button" data-transition="slideup" >Actualizar registro</a>
+        <a href="#eliminar" data-role="button" data-transition="slideup" >Eliminar un registro</a>
+      </ul>
+    </div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="registro">
+  <div data-role="header" >
+    <p>registrar datos</p>
+  </div>
+  <div data-role="content">
+    <label for="tipo">Tipo:</label>
+    <input type="text" id="tipo">
+    <label for="sabor">Sabor:</label>
+    <input type="text" id="sabor">
+    <label for="precio">Precio:</label>
+    <input type="text" id="precio">
+    <input type="button" id="guardar" value="Guardar">
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="consulta">
+  <div data-role="header" >
+    <p>Consultar de tus helados y paletas</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="consultar" value="Consultar">
+    <div id="resconsulta"></div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="consulta2">
+  <div data-role="header" >
+    <p>Consultar </p>
+  </div>
+  <div data-role="content">
+    <label for="valConsulta">Id de tu producto:</label>
+    <input type="text" id="valConsulta" >
+    <input type="button" id="btnconsultar2" value="Consultar">
+    <div id="resconsulta2"></div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="actualizar">
+  <div data-role="header" >
+    <p>Actualizar registros</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsAct" value="Mostrar todos los registros">
+        <div id="respConAct"></div>
+        <label for="nomActualizar">ID a actualizar</label>
+        <input type="text" id="nomActualizar">
+        <input type="button" id="btnCarDatos" value="Cargar Datos">
+            <div id="respCargDatos"></div>
+        <input type="button" id="btnGuarDatos" value="Guardar Datos"> 
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+
+<div data-role="page" id="eliminar">
+  <div data-role="header" >
+    <p>Eliminar registros</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsEliminar" value="Mostrar todos los registros">
+        <div id="respConElim"></div>
+        <label for="idEliminar">ID a Eliminar</label>
+        <input type="text" id="idEliminar">
+        
+        <input type="button" id="btnEliminar" value="Eliminar un registro"> 
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+  
+  <!---------------------------------PRODUCTOS EXTRAS-------------------------------------------->
+  
+<div data-role="page" id="menu2">
+  <div data-role="header" >
+    <p>Helados PINKCROW</p>
+  </div>
+  <div data-role="content">
+    <div>
+      <ul data-role="listview">
+        <a href="#registro2" data-role="button" data-transition="slideup">Registro de productos</a>
+	<a href="#consulta22" data-role="button" data-transition="slideup">Consultar los registros</a>
+	<a href="#consulta3" data-role="button" data-transition="slideup" >Consultar un producto</a>
+        <a href="#actualizar2" data-role="button" data-transition="slideup" >Actualizar registro</a>
+        <a href="#eliminar2" data-role="button" data-transition="slideup" >Eliminar un registro</a>
+      </ul>
+    </div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="registro2">
+  <div data-role="header" >
+    <p>registrar datos</p>
+  </div>
+  <div data-role="content">
+    <label for="tipo">Nombre:</label>
+    <input type="text" id="nombre">
+    <label for="sabor">Categoria:</label>
+    <input type="text" id="categoria">
+    <label for="costo">Costo:</label>
+    <input type="text" id="costo">
+    <input type="button" id="guardar2" value="Guardar">
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="consulta22">
+  <div data-role="header" >
+    <p>Consulta productos extras</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="consultar22" value="Consultar">
+    <div id="resconsulta22"></div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="consulta3">
+  <div data-role="header" >
+    <p>Consultar </p>
+  </div>
+  <div data-role="content">
+    <label for="valConsulta3">Id de tu producto:</label>
+    <input type="text" id="valConsulta3" >
+    <input type="button" id="btnconsultar3" value="Consultar">
+    <div id="resconsulta3"></div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<div data-role="page" id="actualizar2">
+  <div data-role="header" >
+    <p>Actualizar registros</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsAct22" value="Mostrar registros">
+        <div id="respConAct22"></div>
+        <label for="nomActualizar3">ID a actualizar</label>
+        <input type="text" id="nomActualizar3">
+        <input type="button" id="btnCarDatos3" value="Cargar Datos">
+            <div id="respCargDatos3"></div>
+        <input type="button" id="btnGuarDatos3" value="Guardar Datos"> 
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+
+<div data-role="page" id="eliminar2">
+  <div data-role="header" >
+    <p>Eliminar registros</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsEliminar22" value="Mostrar todos los registros">
+        <div id="respConElim22"></div>
+        <label for="idEliminar22">ID a Eliminar</label>
+        <input type="text" id="idEliminar22">
+        
+        <input type="button" id="btnEliminar22" value="Eliminar un registro"> 
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+
+</body>
+</html>
